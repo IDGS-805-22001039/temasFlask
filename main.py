@@ -1,6 +1,48 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from io import open
+import os
 
 app=Flask(__name__)
+
+class Cine:
+    def __init__(self, boletos, compradores, nombre):
+        self.boletos = boletos
+        self.compradores = compradores
+        self.nombre = nombre
+        self.boleto = 12
+        self.total = 0.0
+    
+    def sin_descuento(self):
+        self.total = self.boletos * self.boleto
+        return f"En total pagarás ${self.total}"
+
+    def descuento_10(self):
+        self.total = self.boletos * self.boleto
+        self.total -= self.total * 0.10
+        return self.total
+    
+    def descuento_cineco(self):
+        self.total -= self.total * 0.10
+        return self.total
+    
+    def descuento_15(self):
+        self.total = self.boletos * self.boleto
+        self.total -= self.total * 0.15
+        return self.total
+
+    def guardar_compra(self):
+        if self.compradores == 1:
+            texto = f"\n{self.nombre} compró {self.boletos} boletos por una cantidad de ${self.total}"
+        else:
+            texto = f"\n{self.nombre} y sus {self.compradores} acompañantes compraron {self.boletos} boletos por una cantidad de ${self.total}"
+
+        with open('registro.txt', 'a') as fichero:
+            fichero.write(texto)
+
+    def imprimir_ticket(self):
+        with open('registro.txt', 'r') as fichero:
+            texto = fichero.read()
+        print
 
 @app.route("/")
 def index():
@@ -53,6 +95,51 @@ def form1():
             </form>
 
             '''
+
+@app.route('/OperasBas')
+def oepras():
+    return render_template("OperasBas.html")
+
+@app.route('/resultado1', methods = ["GET", "POST"])
+def resultado1():
+    if request.method == "POST":
+        num1 = request.form.get("n1")
+        num2 = request.form.get("n2")
+        rest = int(num1) * int(num2)
+
+        return "La multiplicación de {} x {} = ".format(num1,num2)
+    
+@app.route('/cineco')
+def cienco():
+    return render_template("cinepolis.html")
+
+@app.route('/comprarBoletos', methods=["POST"])
+def comprarBoletas():
+    nombre = request.form.get("nombre")
+    compradores = int(request.form.get("compradores"))
+    tarjeta_cineco = int(request.form.get("cineco"))
+    boletos = int(request.form.get("cantidad"))
+
+    limite = compradores * 7
+    if boletos > limite:
+        error_message = "Acción requerida: El número de boletos sobrepasa el límite permitido de comprar por comprador."
+        return render_template('cinepolis.html', error=error_message)
+
+    cine = Cine(boletos, compradores, nombre)
+    if boletos > 0 and boletos <= 2:
+        cine.sin_descuento()
+    elif boletos >= 3 and boletos <= 5:
+        cine.descuento_10()
+    elif boletos > 5:
+        cine.descuento_15()
+
+    if tarjeta_cineco == 1:
+        cine.descuento_cineco()
+
+    cine.guardar_compra()
+    total = cine.total
+
+    return render_template('cinepolis.html', total=total)
 
 if __name__=="__main__":
     app.run(debug=True, port=3000)
