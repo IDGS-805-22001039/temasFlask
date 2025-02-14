@@ -1,0 +1,11 @@
+{%macro datos(name,placeholder,type="text")%}
+
+<P><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}"></P>
+
+{%endmacro%}
+
+{%macro campoNuevo(field)%}
+
+<td>{{field.label}}</td>
+<dd>{{field(** kwargs) | safe}}</dd>
+{%endmacro%}
