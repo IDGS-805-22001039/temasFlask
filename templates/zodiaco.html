@@ -1,0 +1,66 @@
+{% extends "layout.html"%}
+{% block container %}
+{% import "_macros.html" as macros %}
+
+<div class="container">
+    <div>
+        <h1>Formulario Zodiaco</h1>
+        <form action="" method="post" novalidate>
+
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    {{ macros.campoNuevo(form.nombre, class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    {{ macros.campoNuevo(form.apaterno, class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    {{ macros.campoNuevo(form.amaterno, class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    <div class="d-flex justify-content-between">
+                        <div class="me-2">
+                            {{ macros.campoNuevo(form.dia, class="form-control", placeholder="Día") }}
+                        </div>
+                        <div class="me-2">
+                            {{ macros.campoNuevo(form.mes, class="form-control", placeholder="Mes") }}
+                        </div>
+                        <div>
+                            {{ macros.campoNuevo(form.anio, class="form-control", placeholder="Año") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row control-group">
+                <div class="form-group col-xs-12 floating-label-form-group controls">
+                    {{ macros.campoNuevo(form.sexo, class="form-control") }}
+                </div>
+            </div>
+
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+
+        </form>
+
+        <div class="info-container" style="text-align: right;">
+            <h2>Nombre: {{ nombre }}</h2>
+            <h2>Apellido Paterno: {{ apaterno }}</h2>
+            <h2>Apellido Materno: {{ amaterno }}</h2>
+            <h2>Día: {{ dia }}</h2>
+            <h2>Mes: {{ mes }}</h2>
+            <h2>Año: {{ anio }}</h2>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,10 +1,37 @@
 from flask import Flask, render_template, request
+from flask import flash
+from flask_wtf.csrf import CSRFProtect 
 from io import open
 import os
 import forms
+from forms import ZodiacoForm
+
+g=""
+
+animales_zodiaco = {
+    0: "rata", 1: "buey", 2: "tigre", 3: "conejo", 4: "dragon",
+    5: "serpiente", 6: "caballo", 7: "cabra", 8: "mono",
+    9: "gallo", 10: "perro", 11: "cerdo"
+}
 
 
 app=Flask(__name__)
+app.secret_key="Agua de guayaba"
+csrf = CSRFProtect()
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html")
+
+""" @app.before_request
+def before_request():
+    g.nombre = "Mario"
+    print("before 1")
+    
+@app.after_request
+def aster_request(response):
+    print("after 1")   
+    return response  """
 
 class Cine:
     def __init__(self, boletos, compradores, nombre):
@@ -59,13 +86,39 @@ def alumnos():
     ape=""
     email=""
     alumno_clase=forms.UserForm(request.form)
-    if request.method=="POST":
+    if request.method=="POST" and alumno_clase.validate():
         mat = alumno_clase.matricula.data
         nom = alumno_clase.nombre.data
         ape = alumno_clase.Apellido.data
         email = alumno_clase.email.data
-        print('Nombre: {}'.format(nom)) 
-    return render_template("Alumnos.html", form=alumno_clase)   
+        mensaje ="Hola {}".format(nom)
+        flash(mensaje)
+    return render_template("Alumnos.html", form=alumno_clase, mat=mat, nom=nom, ape=ape, email=email)
+
+@app.route("/zodiaco", methods=["GET", "POST"])
+def zodiaco():
+    nombre = ""
+    apaterno = ""
+    amaterno = ""
+    dia = 0
+    mes = 0
+    anio = 0
+    sexo = ""
+    form = ZodiacoForm(request.form)
+    if request.method == "POST" and form.validate():
+        nombre = form.nombre.data
+        apaterno = form.apaterno.data
+        amaterno = form.amaterno.data
+        dia = int(form.dia.data)
+        mes = int(form.mes.data)
+        anio = int(form.anio.data)
+        sexo = form.sexo.data
+        
+        signo = animales_zodiaco[(anio - 1912) % 12]
+        
+        
+        return render_template("Zodiaco.html", form=form, nombre=nombre, apaterno=apaterno, amaterno=amaterno, dia=dia, mes=mes, anio=anio, sexo=sexo)
+    return render_template("Zodiaco.html", form=form)
     
 
 @app.route("/ejemplo1")
@@ -160,4 +213,5 @@ def comprarBoletas():
     return render_template('cinepolis.html', total=total)
 
 if __name__=="__main__":
+    csrf.init_app(app)
     app.run(debug=True, port=3000)
